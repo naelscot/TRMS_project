@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TRMS - application</title>
+<link rel="stylesheet" href="{{ url_for('static',filename='styles/styles.css') }}">
+</head>
+
+<body>
+    <div class="center">
+        <button onclick="approval()"> Go To Approver Section >>></button>
+        <div style="height: 50px;">
+            <h4 id="welcome"></h4>
+            <p>You have: <strong id="amountavail">$1000</strong> available</p>
+        </div>
+        <br>
+        <br>
+        <br>
+        <table class="center">
+            <tr>
+                <td>Type:</td>
+                    <td>
+                        <select id="eventType" name="type" required>
+                            <option value="certification">certification</option>
+                            <option value="certification prep">certification prep class</option>
+                            <option value="seminar">seminar</option>
+                            <option value="technical training">technical training</option>
+                            <option value="university course">university course</option>
+                            <option value="other">other</option>
+                        </select>
+                    </td>
+            </tr>
+            <tr>
+ 
+            <tr>
+                <td>Description:</td>
+                <td>
+                    <input id="descr" type="text" name="description" required>
+                </td>
+            </tr>
+            <tr>
+                <td>Cost:</td>
+                <td>
+                    <input id="cost" type="text" name="cost" placeholder="$" required>
+                </td>
+            </tr>
+            <tr>
+                <td>Start Date:</td>
+                <td>
+                    <input id="Date" type="text" name="startDate" placeholder="MM/DD/YY" required>
+                </td>
+            </tr>
+            <tr>
+                <td>Reason:</td>
+                <td>
+                    <select id="reason" name="reason" required>
+                        <option value="career advancement">career advancement</option>
+                        <option value="continuing education">continuing education</option>
+                        <option value="project pre-requisite">project pre-requisite</option>
+                        <option value="personal interest">personal interest</option>
+                        <option value="other">other</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Grade Format:</td>
+                <td>
+                    <select id="gradeForm" name="gradeFormat" required>
+                        <option value="percentage">percentage</option>
+                        <option value="passfail">pass/fail</option>
+                        <option value="presentation">presentation</option>
+                        <option value="other">other</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Grade Cutoff:</td>
+                <td>
+                    <input id="gradeCut" type="text" name="gradeCutOff" placeholder="minimum passing" required>
+                </td>
+            </tr>
+            <tr>
+                <td>Amount Requested:</td>
+                <td>
+                    <select id="requested" name="requested" required>
+                        <option value="1000">1000</option>
+                        <option value="900">900</option>
+                        <option value="800">800</option>
+                        <option value="750">750</option>
+                        <option value="600">600</option>
+                        <option value="300">300</option>
+                    </select>>
+                </td>
+            </tr>
+        </table>
+        <button type="submit" onclick="submitApplication()">SUBMIT</button>
+        <button type="submit" onClick="window.location = '/';">Log Out</a></button>
+    </div>
+<script>
+
+// function on load 'welcome, fname'
+// display funds left [{1000 - cost[0]}
+
+let empId = sessionStorage.getItem('employee_id');
+let role = sessionStorage.getItem('role');
+let name = sessionStorage.getItem('fname');
+
+let amountavail = 1000;
+
+window.onload = function(){
+    document.getElementById("welcome").innerHTML = "Welcome," + " " + name;
+}
+
+async function submitApplication(){
+    correct = false;
+    let vals = null
+
+    console.log("Working")
+	const eventType = document.getElementById("eventType").value;
+    const descr = document.getElementById("descr").value;
+    const cost = document.getElementById("cost").value;
+    const Date = document.getElementById("Date").value;
+    const reason = document.getElementById("reason").value;
+	const gradeForm = document.getElementById("gradeForm").value;
+    const gradeCut = document.getElementById("gradeCut").value;
+    const requested = document.getElementById("requested").value;
+
+
+    const url = `http://127.0.0.1:5000/application`;
+
+    const application = {
+        "emp_id" : empId,
+		"event_type" : eventType,
+        "description" : descr,
+        "cost" : cost,
+        "date_occur" : Date,
+        "reason" : reason,
+        "grade_form" : gradeForm,
+        "grade_cut" : gradeCut,
+        "requested" : requested
+	}
+
+	console.log(application)
+
+	const httpresponse = fetch(url, {
+		method: 'POST',
+		body: JSON.stringify(application),
+		headers: {
+			"Content-type": "application/json; charset=UTF-8"
+		}
+	});
+
+	httpresponse.then(response => {
+		if(response.status==200){
+			window.location.href="/application/submitted"
+            correct = true;
+		}else{
+			alert("Please try again - Could not submit application");
+            console.log("Failure"); 
+		}
+	})
+     
+}
+
+function approval(){
+	if(role == "101"){
+        window.location = "/approval";
+    } else if(role == "202"){
+        window.location = "/approval";
+    } else if(role == "303"){
+        window.location = "/approval";
+    } else{
+        alert("You are not authorized")
+    }
+
+}
+
+</script>
+</body>
+
+</html>

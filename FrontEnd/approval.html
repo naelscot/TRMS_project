@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>TRMS -- Application Review</title>
+</head>
+<body>
+	<h3></h3>
+    <table>
+        <tr>
+            <td>ROLE:</td>
+                <td>
+                    <select id="approver" name="type" required>
+                        <option value="101">Direct Supervisor</option>
+                        <option value="202">Department Head</option>
+                        <option value="303">Benefits Coordinator</option>
+                    </select>
+                </td>
+        </tr>
+        <button type="submit" onclick="verify();">Verify</button>
+    </table>
+    <br>
+    <br>
+        <table>
+            <tbody id="appData">
+                
+            </tbody>
+        </table>
+
+	<br>
+    <br>
+        <button type="submit" onclick="moreInfo()">Request more INFO</button>
+        <button type="submit" onclick="submitDecision()">Submit</button>
+    <br>
+    <br>
+	<button type="submit" onClick="window.location = '/';">Log Out</a></button>
+
+<script>
+let empId = sessionStorage.getItem('employee_id');
+let role = sessionStorage.getItem('role');
+let email = sessionStorage.getItem('email');
+
+let e = document.getElementById('approver');
+
+let amountavail = 1000;
+let award = 0;
+
+</script>
+<script>
+function verify() {
+    let pos = e.options[e.selectedIndex].value;
+    if(role == pos && role == '101') {
+        getApp();
+    } else if(role == pos && role == '202') {
+        window.location.href = "/approval/head";
+    } else if(role == pos && role == '303') {
+        window.location.href = "/approval/benco";
+    } else {
+        alert("This is unavailable")
+    }
+}
+
+async function getApp() {
+    console.log("Getting Application")
+    const httpResponse = await fetch("http://127.0.0.1:5000/application/")
+    console.log(httpResponse)
+
+    const body = await httpResponse.json()
+    
+    let result = []
+    for(var i in body){
+        result.push(body[i])
+    }
+
+    function drawTable(tbody) {
+        var tbody = document.getElementById("appData");
+        var names = new Array();
+        names[0] = {App_ID: null, Emp_ID: null, Event_Type: null, Description: null,
+                    Cost: null, Date: null, Reason: null, Grade_Format: null, Grade: null, 
+                    Requested: null, Status: null, Award: null};
+        var headerNames = Object.getOwnPropertyNames(names[0]);
+        var columnCount = headerNames.length;
+
+        var row = tbody.insertRow(-1);
+        for (var i = 0; i < columnCount; i++) {
+            var headerCell = document.createElement("TH");
+            headerCell.innerHTML = headerNames[i];
+            row.appendChild(headerCell);
+        }
+        
+        var tr, td;
+    
+    for (var i = 0; i < result.length; i++) {
+        tr = tbody.insertRow(tbody.rows.length);
+        td = tr.insertCell(tr.cells.length);
+        td.setAttribute("align", "center");
+
+        td.innerHTML = result[i].app_id;
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = result[i].emp_id;
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = result[i].event_type;
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = result[i].description;
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = result[i].cost;
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = result[i].date_occur;
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = result[i].reason;
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = result[i].grade_form;
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = result[i].grade_cut;
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = result[i].requested;
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = "<select class='appStatus' name='status' required><option value='Pending'>Pending</option><option value='Approved'>Approved</option><option value='Denied'>Denied</option></select>"
+        // drop down update status
+        td = tr.insertCell(tr.cells.length);
+        td.innerHTML = award;
+    }
+}
+    drawTable("appData");
+}
+</script>
+
+<script>
+function submitDecision(){
+    if(role == '101') {
+        updateApp();
+    } else {
+        console.log("Failure")
+    }
+
+    async function updateApp() {
+        const s = document.getElementsByClassName("appStatus");
+        
+    }
+    
+     
+}
+
+function moreInfo(){
+    alert("An email has been sent to notify party")
+}
+</script>
+</body>
+</html>
